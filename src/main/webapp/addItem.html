@@ -65,6 +65,7 @@
 			}
 		}
 
+		console.log(data);
 		$.ajax({
 			url : 'rest/item',
 			type : "POST",
@@ -94,16 +95,6 @@
 			window.location.replace("login.html");
 		});
 	}
-	
-    function logout() {
-    	$.ajax({
-            url: 'rest/user/logout',
-            type: "GET",
-            dataType: "text"
-        }).always(function(data){
-        	window.location.replace("login.html");
-        });
-    }
 
 </script>
 </head>

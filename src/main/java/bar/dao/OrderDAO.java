@@ -1,6 +1,5 @@
 package bar.dao;
 
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
@@ -22,6 +21,8 @@ public class OrderDAO {
 	private EntityManager em;
 
 	public void addOrder(Order order) {
+		order.setDateOfOrder(new Date());
+		order.setStatus(Status.WAITING);
 		order.calculateTotalPrice();
 		em.persist(order);
 	}

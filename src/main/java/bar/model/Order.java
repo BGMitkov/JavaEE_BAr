@@ -15,8 +15,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +34,11 @@ public class Order implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@ManyToMany
+	private List<Item> itemsInOrder;
+	
+	private String tableNumber;
+	
 	@ManyToOne
 	private User executor;
 
@@ -48,34 +51,29 @@ public class Order implements Serializable {
 	@Temporal(TemporalType.DATE)
 	private Date dateOfAcceptance;
 
-	@ManyToMany
-	private List<Item> itemsInOrder = new ArrayList<>();
-
 	private float totalPrice;
 
-	private int tableNumber;
-
-	private int count;
-
-	public Order(int tableNumber, String itemName, int count) {
+	public Order(){
+	}
+	
+	public Order(List<Item> itemsInOrder, String tableNumber) {
+		super();
+		this.itemsInOrder = itemsInOrder;
 		this.tableNumber = tableNumber;
-		this.count = count;
 		this.status = Status.WAITING;
-		this.dateOfAcceptance = new Date();
-
+		this.dateOfOrder = new Date();
 		this.totalPrice = 0.0f;
 	}
 
-	public Order() {
+	/*public Order() {
 		this.status = Status.WAITING;
 		this.dateOfAcceptance = new Date();
 
 		this.totalPrice = 0.0f;
 		this.tableNumber = -1;
-		this.count = 0;
-	}
+	}*/
 
-	public Order( List<Item> itemsInOrder) {
+	/*public Order( List<Item> itemsInOrder) {
 		super();
 		this.status = Status.WAITING;
 		this.dateOfOrder=new Date();
@@ -83,8 +81,7 @@ public class Order implements Serializable {
 		this.itemsInOrder=itemsInOrder;
 
 		this.tableNumber = -1;
-		this.count = 0;
-	}
+	}*/
 
 	public Long getId() {
 		return this.id;
@@ -128,7 +125,13 @@ public class Order implements Serializable {
 		this.dateOfAcceptance = dateOfAcceptance;
 	}
 
+	public List<Item> getItemsInOrder() {
+		return itemsInOrder;
+	}
 
+	public void setItemsInOrder(List<Item> itemsInOrder) {
+		this.itemsInOrder = itemsInOrder;
+	}
 	
 	public double getTotalPrice() {
 		return totalPrice;
@@ -146,20 +149,12 @@ public class Order implements Serializable {
 		setTotalPrice(sumPrice);
 	}
 
-	public int getTableNumber() {
+	public String getTableNumber() {
 		return tableNumber;
 	}
 
-	public int getCount() {
-		return count;
-	}
-
-	void setTableNumber(int tableNumber) {
+	void setTableNumber(String tableNumber) {
 		this.tableNumber = tableNumber;
-	}
-
-	void setCount(int count) {
-		this.count = count;
 	}
 
 	@Override
