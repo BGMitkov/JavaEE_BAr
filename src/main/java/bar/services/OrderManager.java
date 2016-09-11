@@ -2,6 +2,7 @@ package bar.services;
 
 import java.net.HttpURLConnection;
 import java.util.Collection;
+import java.util.Date;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -10,7 +11,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import bar.dao.OrderDAO;
 import bar.model.Order;
+import bar.model.Status;
 
 @Stateless
 @Path("order")
@@ -34,6 +35,9 @@ public class OrderManager {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response order(Order newOrder) {
+		newOrder.setDateOfOrder(new Date());
+		newOrder.calculateTotalPrice();
+		newOrder.setStatus(Status.WAITING);
 		orderDAO.addOrder(newOrder);
 		return RESPONSE_OK;
 	}
@@ -51,26 +55,6 @@ public class OrderManager {
 	public Collection<Order> getCurrentUserOrders() {
 		return orderDAO.getCurrentUserOrders(context.getCurrentUser());
 	}
-
-	// @Path("/order")
-	// @POST
-	// @Consumes(MediaType.APPLICATION_JSON)	
-	// public Response order(Order newOrder) {
-	// orderDAO.addOrder(newOrder);
-	// return Response.noContent().build();
-	// }
-
-	// @Path("/accept")
-	// @PUT
-	// @RolesAllowed({"Manager", "Barman"})
-	// public Response accept() {
-	// if (!(context.isCallerInRole("Manager") |
-	// context.isCallerInRole("Barman"))) {
-	// return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
-	// }
-	// orderDAO.setOrderAsAccepted(order, user);
-	//
-	// }
 
 	@PUT
 	@Path("/accept")
@@ -90,14 +74,33 @@ public class OrderManager {
 		
 	}
 
+	@PUT
 	@Path("/overdue")
-	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsOverdue(@QueryParam("orderId") String orderId) {
 		Order orderOverdue = orderDAO.findById(Long.parseLong(orderId));
 		if(orderOverdue != null) {
 			orderDAO.setOrderAsOverdue(orderOverdue);
 		}
-		return Response.noContent().build();
+		return Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
+	}
+	
+	@PUT
+	@Path("/complete")
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response setOrderAsComplete(@QueryParam("orderId") String orderId) {
+		Order orderCompleted = orderDAO.findById(Long.parseLong(orderId));
+		if(orderCompleted != null) {
+			if(orderCompleted.getStatus() != Status.COMPLETE){
+				orderDAO.setOrderAsCompleted(orderCompleted);
+				return RESPONSE_OK;
+			}
+			else {
+				return Response.status(HttpURLConnection.HTTP_NOT_MODIFIED).build();
+			}
+		}
+		else {
+			return Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
+		}
 	}
 }

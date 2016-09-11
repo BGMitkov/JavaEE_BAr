@@ -147,21 +147,21 @@ public class Order implements Serializable {
 	private void setTotalPrice(float totalPrice) {
 		this.totalPrice = totalPrice;
 	}
+	
+	public String getTableNumber() {
+		return tableNumber;
+	}
 
+	public void setTableNumber(String tableNumber) {
+		this.tableNumber = tableNumber;
+	}
+	
 	public void calculateTotalPrice() {
 		float sumPrice = 0.0f;
 		for (Item item : itemsInOrder) {
 			sumPrice += Float.parseFloat(item.getPrice());
 		}
 		setTotalPrice(sumPrice);
-	}
-
-	public String getTableNumber() {
-		return tableNumber;
-	}
-
-	void setTableNumber(String tableNumber) {
-		this.tableNumber = tableNumber;
 	}
 
 	@Override

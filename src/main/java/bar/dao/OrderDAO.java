@@ -2,8 +2,6 @@ package bar.dao;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
-
 import javax.ejb.Singleton;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -23,9 +21,6 @@ public class OrderDAO {
 
 	public void addOrder(Order order) {
 		em.persist(order);
-		order.setDateOfOrder(new Date());
-		order.setStatus(Status.WAITING);
-		order.calculateTotalPrice();
 	}
 
 	public Collection<Order> getAllWaitingOrders() {
@@ -70,6 +65,16 @@ public class OrderDAO {
 	public void setOrderAsOverdue(Order orderOverdue) {
 		Order foundOrder = findById(orderOverdue.getOrderId());
 		foundOrder.setStatus(Status.OVERDUE);
+	}
+	
+	public void setOrderAsCompleted(Order orderCompleted) {
+		Order foundOrder = findById(orderCompleted.getOrderId());
+		if(foundOrder.getStatus() == Status.ACCEPTED) {
+			foundOrder.setStatus(Status.COMPLETE);
+		}
+		else if (foundOrder.getStatus() == Status.OVERDUE) {
+			foundOrder.setStatus(Status.OVERDUE_COMPLETED);
+		}
 	}
 
 	public float estimateProfitBetweenTwoDates(Date begDate, Date endDate) {

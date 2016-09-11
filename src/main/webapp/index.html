@@ -110,6 +110,9 @@
 							204 : function(){
 								alert("Order not found!");
 								drawTableWithOrders();
+							},
+							200 : function() {
+								drawTableWithOrders();
 							}
 						}
 					});
@@ -126,7 +129,20 @@
 						url : 'rest/order/complete?orderId=' + rowData.orderId,
 						type : "PUT",
 						dataType : "json",
-						success : drawTableWithOrders()
+						success : drawTableWithOrders(),
+						statusCode : {
+							304 : function() {
+								alert("Order already completed!");
+								drawTableWithOrders();
+							},
+							204 : function() {
+								alert("Order not found!");
+								drawTableWithOrders();
+							},
+							200 : function() {
+								drawTableWithOrders();
+							}
+						}
 					});
 				});
 			}
