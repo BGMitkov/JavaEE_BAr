@@ -1,5 +1,6 @@
 package bar.services;
 
+import java.net.HttpURLConnection;
 import java.util.Collection;
 
 import javax.ejb.Stateless;
@@ -7,7 +8,9 @@ import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -35,7 +38,7 @@ public class OrderManager {
 		return RESPONSE_OK;
 	}
 
-	@Path("waiting")
+	@Path("/waiting")
 	@GET
 	@Produces("application/json")	
 	public Collection<Order> getAllWaitingOrders() {
@@ -69,20 +72,32 @@ public class OrderManager {
 	//
 	// }
 
+	@PUT
 	@Path("/accept")
-	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsAccepted(@QueryParam("orderId") String orderId) {
-		orderDAO.setOrderAsAccepted(Long.parseLong(orderId),context.getCurrentUser());
-		return RESPONSE_OK;
+		Order orderToAccept = orderDAO.findById(Long.parseLong(orderId));
+		if(orderToAccept != null) {
+			if(orderToAccept.getExecutor() == null){
+				orderDAO.setOrderAsAccepted(orderToAccept,context.getCurrentUser());
+				return RESPONSE_OK;
+			}
+			else {
+				return Response.status(HttpURLConnection.HTTP_CONFLICT).build();
+			}
+		}
+		return Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
+		
 	}
 
 	@Path("/overdue")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsOverdue(@QueryParam("orderId") String orderId) {
-		orderDAO.setOrderAsOverdue(Long.parseLong(orderId));
-
-		return RESPONSE_OK;
+		Order orderOverdue = orderDAO.findById(Long.parseLong(orderId));
+		if(orderOverdue != null) {
+			orderDAO.setOrderAsOverdue(orderOverdue);
+		}
+		return Response.noContent().build();
 	}
 }

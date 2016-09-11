@@ -1,17 +1,22 @@
 package bar.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @XmlRootElement
+@Table(name = "ITEMS")
 @NamedQueries({
 		@NamedQuery(name = "findByPriceAndName", query = "SELECT i FROM Item i WHERE i.itemName = :name AND i.price = :price"),
 		@NamedQuery(name = "getAllItems", query = "SELECT i FROM Item i")})
@@ -21,15 +26,23 @@ public class Item implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	@Column(name = "itemId")
+	private Long itemId;
 
+	@Column(name = "itemName")
 	private String itemName;
 
+	@Column(name = "price")
 	private String price;
-
+	
+	@Column(name = "type")
 	private String type;
 
+	@Column(name = "description")
 	private String description;
+	
+	@ManyToMany(mappedBy = "itemsInOrder")
+	private List<Order> ordersForItems;
 
 	public Item() {
 	}
@@ -42,12 +55,12 @@ public class Item implements Serializable {
 		this.description = description;
 	}
 
-	public Long getId() {
-		return this.id;
+	public Long getItemId() {
+		return this.itemId;
 	}
 
-	public void setId(final Long id) {
-		this.id = id;
+	public void setItemId(final Long id) {
+		this.itemId = id;
 	}
 
 	public String getItemName() {
@@ -87,8 +100,8 @@ public class Item implements Serializable {
 		String result = getClass().getSimpleName() + " ";
 		if (itemName != null && !itemName.trim().isEmpty())
 			result += "name: " + itemName;
-		if (id != null)
-			result += ", id: " + id;
+		if (itemId != null)
+			result += ", id: " + itemId;
 		if (itemName != null && !itemName.trim().isEmpty())
 			result += "name: " + itemName;
 		if (price != null && !price.trim().isEmpty())
@@ -108,8 +121,8 @@ public class Item implements Serializable {
 			return false;
 		}
 		Item other = (Item) obj;
-		if (id != null) {
-			if (!id.equals(other.id)) {
+		if (itemId != null) {
+			if (!itemId.equals(other.itemId)) {
 				return false;
 			}
 		}
@@ -120,7 +133,7 @@ public class Item implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((itemId == null) ? 0 : itemId.hashCode());
 		return result;
 	}
 }

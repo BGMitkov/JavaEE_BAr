@@ -71,7 +71,7 @@
 			createTable(rowData.type);
 		}
 		$(tableID + ' table').append(row);
-		row.append($("<td>" + rowData.id + "</td>"));
+		row.append($("<td>" + rowData.itemId + "</td>"));
 		row.append($("<td>" + rowData.itemName + "</td>"));
 		row.append($("<td>" + rowData.price + "</td>"));
 		row.append($("<td>" + rowData.type + "</td>"));
@@ -80,16 +80,16 @@
 		if (isUserAuthenticated) {
 			var addTd = $("<td />");
 			var link = $("<button>Add</button>");
-			link.attr("id", rowData.id);
+			link.attr("id", rowData.itemId);
 			addTd.append(link);
 			var amount = $("<input type='number' value='1'>");
-			amount.attr("id", 'amountOf_' + rowData.id);
+			amount.attr("id", 'amountOf_' + rowData.itemId);
 			addTd.append(amount);
 			row.append(addTd);
 			link.click(function() {
 				console.log("adding item");
 				for (var i = 0; i < allItems.length; i++) {
-					if (this.id == allItems[i].id) {
+					if (this.id == allItems[i].itemId) {
 						var count = $('#amountOf_' + this.id).val();
 						for (var j = 0; j < count; j++) {
 							listOfItemsToOrder.push(allItems[i]);
@@ -191,8 +191,8 @@
 		<a href="login.html" onclick="logout()"> Logout </a>
 	</div>
 
-	<div class="add_order">
-		<a href="addOrder.html" class="add_order_form">Add Order</a> <a
+	<div class="item_order">
+		<a href="addingOrder.html" class="add_order_form">Add Order</a> <a
 			href="addItem.html" class="add_item_form">Add Items</a>
 	</div>
 	<form id="order_form" role="form" method="post">

@@ -34,9 +34,6 @@ public class User implements Serializable {
 	@Temporal(TemporalType.DATE)
 	private Date dateOfBirth;
 
-	@OneToMany
-	private Set<Order> currentOrders = new HashSet<>();
-
 	public User() {
 	}
 
@@ -85,14 +82,6 @@ public class User implements Serializable {
 
 	public void setDateOfBirth(Date dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
-	}
-
-	public Set<Order> getCurrentOrders() {
-		return this.currentOrders;
-	}
-
-	public void setCurrentOrders(final Set<Order> currentOrders) {
-		this.currentOrders = currentOrders;
 	}
 
 	public String getRole() {

@@ -1,3 +1,9 @@
+.buttonAccept {
+	background-color: #4CAF50;
+}
+.buttonComplete {
+	background-color: #21ABCD;
+}
 .slide_button{
 	display: block;
 	width : 100px;
@@ -5,15 +11,15 @@
 .table_div{
 	display:none;
 }
+.item_order{
+	position: absolute;
+	top: 30px;
+	right: 210px;
+}
 .login_register {
 	position: absolute;
 	top: 30px;
-	right:60px;
-}
-.add_order {
-	position: absolute;
-	top: 30px;
-	right:90px;
+	right: 30px;
 }
 .logout {
 	position: absolute;

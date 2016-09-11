@@ -1,28 +1,31 @@
 package bar.model;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 @XmlRootElement
 @Table(name = "ORDERS")
 @NamedQueries({ @NamedQuery(name = "findById", query = "SELECT o FROM Order o WHERE o.status = :status"),
-		@NamedQuery(name = "findByStatus", query = "SELECT o FROM Order o WHERE o.status = :status"),
+		@NamedQuery(name = "findByStatus", query = "SELECT o FROM Order o WHERE o.status = :status1 OR o.status = :status2 OR o.status = :status3"),
 		@NamedQuery(name = "getAcceptedAndOverdue", query = "SELECT o FROM Order o WHERE o.executor = :executor AND (o.status = :status1 OR o.status = :status2)"),
 		@NamedQuery(name = "setOrderAsOverdue", query = "SELECT o FROM Order o WHERE o.executor = :executor AND (o.status = :status1 OR o.status = :status2)"), })
 
@@ -32,30 +35,39 @@ public class Order implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+	@Column(name = "orderId")
+	private Long orderId;
 
 	@ManyToMany
+	@JoinTable(name = "ORDER_HAS_ITEMS", joinColumns = {
+			@JoinColumn(name = "orderId", referencedColumnName = "orderId") }, inverseJoinColumns = {
+					@JoinColumn(name = "itemId", referencedColumnName = "itemId") })
 	private List<Item> itemsInOrder;
-	
-	private String tableNumber;
-	
-	@ManyToOne
-	private User executor;
 
+	@Column(name = "tableNumber")
+	private String tableNumber;
+
+	@Column(name = "executor")
+	private String executor;
+
+	@Column(name = "status")
 	@Enumerated(EnumType.STRING)
 	private Status status;
 
-	@Temporal(TemporalType.DATE)
+	@Column(name = "dateOfOrder")
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateOfOrder;
 
-	@Temporal(TemporalType.DATE)
+	@Column(name = "dateOfAcceptance")
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateOfAcceptance;
 
+	@Column(name = "totalPrice")
 	private float totalPrice;
 
-	public Order(){
+	public Order() {
 	}
-	
+
 	public Order(List<Item> itemsInOrder, String tableNumber) {
 		super();
 		this.itemsInOrder = itemsInOrder;
@@ -65,37 +77,34 @@ public class Order implements Serializable {
 		this.totalPrice = 0.0f;
 	}
 
-	/*public Order() {
-		this.status = Status.WAITING;
-		this.dateOfAcceptance = new Date();
+	/*
+	 * public Order() { this.status = Status.WAITING; this.dateOfAcceptance =
+	 * new Date();
+	 * 
+	 * this.totalPrice = 0.0f; this.tableNumber = -1; }
+	 */
 
-		this.totalPrice = 0.0f;
-		this.tableNumber = -1;
-	}*/
+	/*
+	 * public Order( List<Item> itemsInOrder) { super(); this.status =
+	 * Status.WAITING; this.dateOfOrder=new Date(); this.totalPrice = 0.0f;
+	 * this.itemsInOrder=itemsInOrder;
+	 * 
+	 * this.tableNumber = -1; }
+	 */
 
-	/*public Order( List<Item> itemsInOrder) {
-		super();
-		this.status = Status.WAITING;
-		this.dateOfOrder=new Date();
-		this.totalPrice = 0.0f;
-		this.itemsInOrder=itemsInOrder;
-
-		this.tableNumber = -1;
-	}*/
-
-	public Long getId() {
-		return this.id;
+	public Long getOrderId() {
+		return this.orderId;
 	}
 
-	public void setId(final Long id) {
-		this.id = id;
+	public void setOrderId(final Long id) {
+		this.orderId = id;
 	}
 
-	public User getExecutor() {
+	public String getExecutor() {
 		return executor;
 	}
 
-	public void setExecutor(User executor) {
+	public void setExecutor(String executor) {
 		this.executor = executor;
 	}
 
@@ -107,7 +116,6 @@ public class Order implements Serializable {
 		this.status = status;
 	}
 
-
 	public Date getDateOfOrder() {
 		return dateOfOrder;
 	}
@@ -115,7 +123,6 @@ public class Order implements Serializable {
 	public void setDateOfOrder(Date dateOfOrder) {
 		this.dateOfOrder = dateOfOrder;
 	}
-	
 
 	public Date getDateOfAcceptance() {
 		return dateOfAcceptance;
@@ -132,7 +139,7 @@ public class Order implements Serializable {
 	public void setItemsInOrder(List<Item> itemsInOrder) {
 		this.itemsInOrder = itemsInOrder;
 	}
-	
+
 	public double getTotalPrice() {
 		return totalPrice;
 	}
@@ -161,10 +168,10 @@ public class Order implements Serializable {
 	public String toString() {
 		String result = getClass().getSimpleName() + " ";
 
-		if (id != null)
-			result += ", id: " + id;
+		if (orderId != null)
+			result += ", id: " + orderId;
 		if (executor != null)
-			result += "executor: " + executor.getUserName();
+			result += "executor: " + executor;
 		if (status != null)
 			result += ", status: " + status;
 		if (dateOfOrder != null)
@@ -178,7 +185,7 @@ public class Order implements Serializable {
 				calculateTotalPrice();
 			result += "Total price: " + getTotalPrice() + "\n";
 		}
-		
+
 		return result;
 	}
 
@@ -191,8 +198,8 @@ public class Order implements Serializable {
 			return false;
 		}
 		Order other = (Order) obj;
-		if (id != null) {
-			if (!id.equals(other.id)) {
+		if (orderId != null) {
+			if (!orderId.equals(other.orderId)) {
 				return false;
 			}
 		}
@@ -203,7 +210,7 @@ public class Order implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((orderId == null) ? 0 : orderId.hashCode());
 		return result;
 	}
 }

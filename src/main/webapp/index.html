@@ -40,10 +40,11 @@
 
 	function drawTableWithOrders() {
 		$.ajax({
-			url : 'rest/order',
+			url : 'rest/order/waiting',
 			type : "GET",
 			dataType : "json",
 			success : function(data) {
+				console.log(data);
 				if (data != null) {
 					renderTable(data);
 				} else {
@@ -65,22 +66,70 @@
 	function renderRow(rowData) {
 		var row = $("<tr />");
 		$("#orders_table").append(row);
-		row.append($("<td>" + rowData.executor.userName + "</td>"));
+		row.append($("<td>" + rowData.orderId + "</td>"));
+		var itemsString = "";
+		var itemsInOrder = rowData.itemsInOrder;
+		if(itemsInOrder.constructor === Array){
+			for(var i = 0; i < itemsInOrder.length; i++) {
+				var count = 1;
+				for(var j = i + 1; j < itemsInOrder.length; j++) {
+					if(itemsInOrder[i].itemName === itemsInOrder[j].itemName){
+						count++;
+						itemsInOrder.splice(j, 1);
+						j--;
+					}
+				}
+				itemsString += itemsInOrder[i].itemName + " " + count + "x, ";
+			}
+		}
+		else {
+			itemsString += itemsInOrder.itemName + " 1x";
+		}
+		row.append($("<td>" + itemsString + "</td>"));
+		row.append($("<td>" + rowData.executor + "</td>"));
 		row.append($("<td>" + rowData.status + "</td>"));
 
-		if (isUserAuthenticated && rowData.amount > 0) {
-			var acceptTd = $("<td />");
-			var link = $("<button>Accept</button>");
-			AcceptTd.append(link);
-			row.append(acceptTd);
-			link.click(function() {
-				$.ajax({
-					url : 'rest/order/accept?id=' + rowData.id,
-					type : "POST",
-					dataType : "json",
-					success : drawTableWithOrders()
+		if (isUserAuthenticated) {
+			if(rowData.status === "WAITING") {
+				var acceptTd = $("<td />");
+				var link = $("<button>Accept</button>");
+				link.attr("class", "buttonAccept");
+				acceptTd.append(link);
+				row.append(acceptTd);
+				link.click(function() {
+					$.ajax({
+						url : 'rest/order/accept?orderId=' + rowData.orderId,
+						type : "PUT",
+						dataType : "json",
+						success : drawTableWithOrders(),
+						statusCode: {
+							409 : function() {
+								alert("Order already taken!");
+								drawTableWithOrders();
+							},
+							204 : function(){
+								alert("Order not found!");
+								drawTableWithOrders();
+							}
+						}
+					});
 				});
-			});
+			}
+			else if(rowData.status === "ACCEPTED") {
+				var acceptTd = $("<td />");
+				var link = $("<button>Complete</button>");
+				link.attr("class", "buttonComplete");
+				acceptTd.append(link);
+				row.append(acceptTd);
+				link.click(function() {
+					$.ajax({
+						url : 'rest/order/complete?orderId=' + rowData.orderId,
+						type : "PUT",
+						dataType : "json",
+						success : drawTableWithOrders()
+					});
+				});
+			}
 		} else {
 			row.append($("<td/>"));
 		}
@@ -111,26 +160,21 @@
 	<div>
 		<table id="orders_table" class="table">
 			<tr>
-				<th>Title</th>
-				<th>Author</th>
-				<th>ISBN</th>
-				<th>Amount</th>
+				<th>Id</th>
+				<th>Executor</th>
+				<th>Status</th>
 				<th>Action</th>
 			</tr>
 		</table>
 	</div>
 
 	<div class="login_register">
-		 <a
-			href="login.html" class="login_form"> Log in </a> <a
-			href="register.html" class="register_form"> Register </a> <a
-			href="login.html" class="login_form"> Log in </a> <a
-			href="register.html" class="register_form"> Register </a>
-
+		<a href="login.html" class="login_form"> Log in </a> <a
+			href="register.html" class="login_form"> Register </a>
 	</div>
-	<div class="add_order">
-	<a href="addingOrder.html" class="add_order_form">Add Order</a> <a
-			href="addItem.html" class="add_item_form">Add Items</a>
+	<div class="item_order">
+		<a href="addingOrder.html" class="login_form">Add Order</a> <a
+			href="addItem.html" class="login_form">Add Items</a>
 	</div>
 	<div class="logout">
 		<a onclick="logout()"> Logout </a>
