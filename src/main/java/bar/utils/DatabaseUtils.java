@@ -57,7 +57,7 @@ public class DatabaseUtils {
     	deleteData();
         addTestUsers();
         addTestItems();
-        addTestOrders();
+        //addTestOrders();
     }
 
     private void deleteData() {

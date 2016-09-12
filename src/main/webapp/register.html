@@ -13,6 +13,7 @@
 		var password = $("#pwd")[0].value;
 		var email = $("#email")[0].value;
 		var role = $("#role").val();
+		
 
 		if (username == "") {
 			alert("Please fill username");
@@ -38,6 +39,7 @@
 				password : password,
 				email : email,
 				role : role
+				
 			}
 		}
 
@@ -58,6 +60,7 @@
 			
 			}
 		}).success(function(data) {
+			document.write(data);
 			$("#register_form").attr("action", "index.html");
 			$("#register_form").submit();
 		}).fail(function(data) {
