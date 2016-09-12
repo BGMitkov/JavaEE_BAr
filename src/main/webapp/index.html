@@ -118,7 +118,12 @@
 					});
 				});
 			}
-			else if(rowData.status === "ACCEPTED") {
+			else if(rowData.status === "ACCEPTED" || rowData.status === "OVERDUE") {
+				var currentDate = new Date();
+				var date = new Date(rowData.dateOfAcceptance);
+				var diff = Math.abs(currentDate - date);
+				var minutes = Math.floor((diff/1000)/60);
+				row.append($("<td>" + minutes + "</td>"));
 				var acceptTd = $("<td />");
 				var link = $("<button>Complete</button>");
 				link.attr("class", "buttonComplete");
@@ -145,6 +150,28 @@
 						}
 					});
 				});
+				if(rowData.status === "ACCEPTED" && minutes >= 5) {
+					$.ajax({
+						url : 'rest/order/overdue?orderId=' + rowData.orderId,
+						type : "PUT",
+						dataType : "json",
+						success : drawTableWithOrders(),
+						statusCode : {
+							409 : function() {
+								alert("Order already is overdue!");
+								drawTableWithOrders();
+							},
+							204 : function() {
+								alert("Order not found!");
+								drawTableWithOrders();
+							},
+							200 : function() {
+								drawTableWithOrders();
+								alert("Order " + rowData.orderId + " is overdue!");
+							}
+						}
+					});
+				}
 			}
 		} else {
 			row.append($("<td/>"));

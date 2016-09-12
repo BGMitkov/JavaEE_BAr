@@ -80,7 +80,13 @@ public class OrderManager {
 	public Response setOrderAsOverdue(@QueryParam("orderId") String orderId) {
 		Order orderOverdue = orderDAO.findById(Long.parseLong(orderId));
 		if(orderOverdue != null) {
-			orderDAO.setOrderAsOverdue(orderOverdue);
+			if(orderOverdue.getStatus() != Status.OVERDUE){
+				orderDAO.setOrderAsOverdue(orderOverdue);
+				return RESPONSE_OK;
+			}
+			else {
+				return Response.status(HttpURLConnection.HTTP_CONFLICT).build();
+			}
 		}
 		return Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
 	}
@@ -91,7 +97,7 @@ public class OrderManager {
 	public Response setOrderAsComplete(@QueryParam("orderId") String orderId) {
 		Order orderCompleted = orderDAO.findById(Long.parseLong(orderId));
 		if(orderCompleted != null) {
-			if(orderCompleted.getStatus() != Status.COMPLETE){
+			if(orderCompleted.getStatus() != Status.COMPLETE && orderCompleted.getStatus() != Status.OVERDUE_COMPLETED){
 				orderDAO.setOrderAsCompleted(orderCompleted);
 				return RESPONSE_OK;
 			}

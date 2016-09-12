@@ -59,6 +59,7 @@ public class OrderDAO {
 	public void setOrderAsAccepted(Order orderToAccept, User executor) {
 		Order foundOrder = findById(orderToAccept.getOrderId());
 		foundOrder.setStatus(Status.ACCEPTED);
+		foundOrder.setDateOfAcceptance(new Date());
 		foundOrder.setExecutor(executor.getUserName());
 	}
 
