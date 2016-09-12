@@ -2,11 +2,9 @@ package bar.model;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
-
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+
 
 @Entity
 @XmlRootElement
