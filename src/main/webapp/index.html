@@ -86,7 +86,7 @@
 			itemsString += itemsInOrder.itemName + " 1x";
 		}
 		row.append($("<td>" + itemsString + "</td>"));
-		row.append($("<td>" + rowData.executor + "</td>"));
+		row.append($("<td>" + rowData.executor.userName + "</td>"));
 		row.append($("<td>" + rowData.status + "</td>"));
 
 		if (isUserAuthenticated) {
@@ -101,7 +101,6 @@
 						url : 'rest/order/accept?orderId=' + rowData.orderId,
 						type : "PUT",
 						dataType : "json",
-						success : drawTableWithOrders(),
 						statusCode: {
 							409 : function() {
 								alert("Order already taken!");
@@ -134,7 +133,6 @@
 						url : 'rest/order/complete?orderId=' + rowData.orderId,
 						type : "PUT",
 						dataType : "json",
-						success : drawTableWithOrders(),
 						statusCode : {
 							304 : function() {
 								alert("Order already completed!");
@@ -150,12 +148,11 @@
 						}
 					});
 				});
-				if(rowData.status === "ACCEPTED" && minutes >= 5) {
+				if(rowData.status === "ACCEPTED" && minutes >= 0) {
 					$.ajax({
 						url : 'rest/order/overdue?orderId=' + rowData.orderId,
 						type : "PUT",
 						dataType : "json",
-						success : drawTableWithOrders(),
 						statusCode : {
 							409 : function() {
 								alert("Order already is overdue!");
@@ -166,8 +163,8 @@
 								drawTableWithOrders();
 							},
 							200 : function() {
-								drawTableWithOrders();
 								alert("Order " + rowData.orderId + " is overdue!");
+								drawTableWithOrders();
 							}
 						}
 					});

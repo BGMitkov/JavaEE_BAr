@@ -3,6 +3,7 @@ package bar.dao;
 import java.util.Collection;
 import java.util.Date;
 import javax.ejb.Singleton;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -18,6 +19,9 @@ public class OrderDAO {
 
 	@PersistenceContext
 	private EntityManager em;
+	
+	@Inject
+	private UserDAO userDAO;
 
 	public void addOrder(Order order) {
 		em.persist(order);
@@ -58,9 +62,10 @@ public class OrderDAO {
 
 	public void setOrderAsAccepted(Order orderToAccept, User executor) {
 		Order foundOrder = findById(orderToAccept.getOrderId());
+		User foundExecutor = userDAO.findUserByName(executor.getUserName());
 		foundOrder.setStatus(Status.ACCEPTED);
 		foundOrder.setDateOfAcceptance(new Date());
-		foundOrder.setExecutor(executor.getUserName());
+		foundOrder.setExecutor(foundExecutor);
 	}
 
 	public void setOrderAsOverdue(Order orderOverdue) {

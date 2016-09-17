@@ -41,7 +41,6 @@ public class UserManager {
 		}
 
 		userDAO.addUser(newUser);
-		context.setCurrentUser(newUser);
 		return RESPONSE_OK;
 	}
 

@@ -22,6 +22,8 @@ public class DatabaseUtils {
     private static User[] USERS = {
             new User("test", "test", "test.user@somemail.com",
                     new Date()),
+            new User("test2", "test2", "test2.user@somemail.com",
+                    new Date()),
             new User("Second User", "Test1234", "second.user@somemail.com",
                     new Date()),
             new User("Third User", "98411TA", "third.user@somemail.com",
@@ -57,7 +59,7 @@ public class DatabaseUtils {
     	deleteData();
         addTestUsers();
         addTestItems();
-        //addTestOrders();
+        addTestOrders();
     }
 
     private void deleteData() {

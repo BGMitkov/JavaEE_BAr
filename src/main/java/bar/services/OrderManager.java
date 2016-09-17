@@ -64,7 +64,7 @@ public class OrderManager {
 		if(orderToAccept != null) {
 			if(orderToAccept.getExecutor() == null){
 				orderDAO.setOrderAsAccepted(orderToAccept,context.getCurrentUser());
-				return RESPONSE_OK;
+				return Response.status(HttpURLConnection.HTTP_OK).build();
 			}
 			else {
 				return Response.status(HttpURLConnection.HTTP_CONFLICT).build();
@@ -82,7 +82,7 @@ public class OrderManager {
 		if(orderOverdue != null) {
 			if(orderOverdue.getStatus() != Status.OVERDUE){
 				orderDAO.setOrderAsOverdue(orderOverdue);
-				return RESPONSE_OK;
+				return Response.status(HttpURLConnection.HTTP_OK).build();
 			}
 			else {
 				return Response.status(HttpURLConnection.HTTP_CONFLICT).build();
@@ -99,7 +99,7 @@ public class OrderManager {
 		if(orderCompleted != null) {
 			if(orderCompleted.getStatus() != Status.COMPLETE && orderCompleted.getStatus() != Status.OVERDUE_COMPLETED){
 				orderDAO.setOrderAsCompleted(orderCompleted);
-				return RESPONSE_OK;
+				return Response.status(HttpURLConnection.HTTP_OK).build();
 			}
 			else {
 				return Response.status(HttpURLConnection.HTTP_NOT_MODIFIED).build();

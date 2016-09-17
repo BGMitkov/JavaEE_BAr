@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -48,8 +49,9 @@ public class Order implements Serializable {
 	@Column(name = "tableNumber")
 	private String tableNumber;
 
-	@Column(name = "executor")
-	private String executor;
+	@Column(name = "executor_id")
+	@ManyToOne
+	private User executor;
 
 	@Column(name = "status")
 	@Enumerated(EnumType.STRING)
@@ -78,21 +80,6 @@ public class Order implements Serializable {
 		this.totalPrice = 0.0f;
 	}
 
-	/*
-	 * public Order() { this.status = Status.WAITING; this.dateOfAcceptance =
-	 * new Date();
-	 * 
-	 * this.totalPrice = 0.0f; this.tableNumber = -1; }
-	 */
-
-	/*
-	 * public Order( List<Item> itemsInOrder) { super(); this.status =
-	 * Status.WAITING; this.dateOfOrder=new Date(); this.totalPrice = 0.0f;
-	 * this.itemsInOrder=itemsInOrder;
-	 * 
-	 * this.tableNumber = -1; }
-	 */
-
 	public Long getOrderId() {
 		return this.orderId;
 	}
@@ -101,14 +88,14 @@ public class Order implements Serializable {
 		this.orderId = id;
 	}
 
-	public String getExecutor() {
+	public User getExecutor() {
 		return executor;
 	}
 
-	public void setExecutor(String executor) {
+	public void setExecutor(User executor) {
 		this.executor = executor;
 	}
-
+	
 	public Status getStatus() {
 		return status;
 	}

@@ -13,13 +13,12 @@
 		var password = $("#pwd")[0].value;
 		var email = $("#email")[0].value;
 		var role = $("#role").val();
-		
 
 		if (username == "") {
 			alert("Please fill username");
 			return;
 		}
-		
+
 		if (!isPasswordValid(password)) {
 			return;
 		}
@@ -29,17 +28,18 @@
 			return;
 		}
 
-		if(role == "undefined"){
+		if (role == "undefined") {
 			alert("Please choose a role!");
 			return;
 		}
+
 		var data = {
 			user : {
 				userName : username,
 				password : password,
 				email : email,
 				role : role
-				
+
 			}
 		}
 
@@ -57,14 +57,15 @@
 					alert("Username already in use!");
 					$("#reset_register").trigger("click");
 				}
-			
 			}
 		}).success(function(data) {
-			document.write(data);
+			alert("Registration successful!");
 			$("#register_form").attr("action", "index.html");
-			$("#register_form").submit();
 		}).fail(function(data) {
+			alert("Registration failed!")
 			$("#register_form").attr("action", "register.html");
+		}).always(function() {
+			$("#register_form").submit();
 		});
 	}
 
@@ -91,7 +92,9 @@
 </head>
 <body>
 	<div align="left">
-		<h2><a href="index.html">Simple Bar Management</a></h2>	
+		<h2>
+			<a href="index.html">Simple Bar Management</a>
+		</h2>
 	</div>
 	<hr>
 	<h2 align="center">
@@ -99,9 +102,9 @@
 	</h2>
 
 	<div class="login_register">
-		<a href="addingOrder.html" class="add_order_form">Add Order</a>
-		<a href="addItem.html" class="add_item_form">Add Items</a>
-		<a href="login.html" class="reg1ister_form"> Log in </a>
+		<a href="addingOrder.html" class="add_order_form">Add Order</a> <a
+			href="addItem.html" class="add_item_form">Add Items</a> <a
+			href="login.html" class="reg1ister_form"> Log in </a>
 	</div>
 
 	<form id="register_form" role="form" method="post">

@@ -50,6 +50,13 @@ public class UserDAO {
         }
     }
 
+    public User findUserByName(String userName) {
+        String txtQuery = "SELECT u FROM User u WHERE u.userName = :userName";
+        TypedQuery<User> query = em.createQuery(txtQuery, User.class);
+        query.setParameter("userName", userName);
+        return queryUser(query);
+    }
+    
     private String getHashedPassword(String password) {
         try {
             MessageDigest mda = MessageDigest.getInstance("SHA-512");

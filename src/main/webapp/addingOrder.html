@@ -150,13 +150,14 @@
 			type : "POST",
 			contentType : "application/json;charset=UTF-8",
 			data : JSON.stringify(data)
-		}).success(function(data) {
+		}).success(function() {
 			$("#order_form").attr("action", "addingOrder.html");
-			$("#order_form").submit();
 			alert("Order is made!");
-		}).fail(function(data) {
+		}).fail(function() {
 			$("#order_form").attr("action", "addingOrder.html");
 			alert("Order failed!");
+		}).always(function() {
+			$("#order_form").submit();
 		});
 	}
 </script>
