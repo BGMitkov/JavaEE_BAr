@@ -10,6 +10,7 @@
 	isUserAuthenticated = false;
 	var allItems;
 	var listOfItemsToOrder = [];
+	
 	$(document).ready(function() {
 		$.ajax({
 			url : 'rest/user/authenticated',
@@ -158,6 +159,16 @@
 			alert("Order failed!");
 		}).always(function() {
 			$("#order_form").submit();
+		});
+	}
+	
+	function logout() {
+		$.ajax({
+			url : 'rest/user/logout',
+			type : "GET",
+			dataType : "text"
+		}).always(function(data) {
+			window.location.replace("login.html");
 		});
 	}
 </script>

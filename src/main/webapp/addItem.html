@@ -7,7 +7,6 @@
 <link rel="stylesheet" type="text/css" href="styles/bar.css" />
 <script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 <script type="text/javascript">
-	
 	isUserAuthenticated = false;
 	
 	$(document).ready(function() {
@@ -27,8 +26,6 @@
 			}
 		});
 		
-		
-		
 		$.ajax({
 			url : 'rest/user/current',
 			type : "GET",
@@ -40,8 +37,6 @@
 				$(".welcome-greeting").hide();
 			}
 		});
-		
-		
 	});
 	
 	function addItem() {
@@ -139,8 +134,8 @@
 		<button type="reset" class="btn btn-default" id="reset_add_item">Reset</button>
 		<button type="button" onclick="addItem()" class="btn btn-default">Submit</button>
 	</form>
-		<div class="logout">
-			<a onclick="logout()"> Logout </a>
-		</div>
+	<div class="logout">
+		<a href="login.html" onclick="logout()"> Logout </a>
+	</div>
 </body>
 </html>

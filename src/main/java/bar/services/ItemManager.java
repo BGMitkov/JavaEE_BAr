@@ -22,6 +22,9 @@ public class ItemManager {
 
 	@Inject
 	private ItemDAO itemDAO;
+	
+	@Inject
+	private UserContext context;
 
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)

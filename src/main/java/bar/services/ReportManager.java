@@ -15,10 +15,12 @@ import bar.model.DateContainer;
 @Stateless
 @Path("/report")
 public class ReportManager {
+	
 	@Inject 
 	private OrderDAO orderDAO;
 	
-
+	@Inject
+	private UserContext context;
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)

@@ -7,6 +7,37 @@
 <link rel="stylesheet" type="text/css" href="styles/bar.css" />
 <script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 <script type="text/javascript">
+	isUserAuthenticated = false;
+
+	$(document).ready(function() {
+		$.ajax({
+			url : 'rest/user/authenticated',
+			type : "GET",
+			dataType : "json",
+			statusCode : {
+				200 : function() {
+					$(".login_register").hide();
+					isUserAuthenticated = true;
+				},
+				404 : function() {
+					$('.logout').hide();
+				}
+			}
+		});
+
+		$.ajax({
+			url : 'rest/user/current',
+			type : "GET",
+			dataType : "text"
+		}).always(function(data) {
+			if (typeof data != 'undefined') {
+				$("#user-holder").text(data);
+			} else {
+				$(".welcome-greeting").hide();
+			}
+		});
+	});
+
 	function register() {
 		var formUrl = $("#register_form").attr("action");
 		var username = $("#userName")[0].value;
@@ -88,6 +119,16 @@
 		var pattern = /^[a-z0-9_\-\.]{2,}@[a-z0-9_\-\.]{2,}\.[a-z]{2,}$/i;
 		return pattern.test(emailAddress);
 	}
+
+	function logout() {
+		$.ajax({
+			url : 'rest/user/logout',
+			type : "GET",
+			dataType : "text"
+		}).always(function(data) {
+			window.location.replace("login.html");
+		});
+	}
 </script>
 </head>
 <body>
@@ -101,12 +142,13 @@
 		<b>REGISTRATION FORM</b>
 	</h2>
 
-	<div class="login_register">
+	<div class="item_order">
 		<a href="addingOrder.html" class="add_order_form">Add Order</a> <a
-			href="addItem.html" class="add_item_form">Add Items</a> <a
-			href="login.html" class="reg1ister_form"> Log in </a>
+			href="addItem.html" class="add_item_form">Add Items</a>
 	</div>
-
+	<div class="login_register">
+		<a href="login.html" class="reg1ister_form"> Log in </a>
+	</div>
 	<form id="register_form" role="form" method="post">
 		<div class="form-group">
 			<label for="userName">Username:</label> <input type="text"
@@ -141,6 +183,9 @@
 		<button type="reset" class="btn btn-default" id="reset_register">Reset</button>
 		<button type="button" onclick="register()" class="btn btn-default">Submit</button>
 	</form>
+	<div class="logout">
+		<a href="login.html" onclick="logout()"> Logout </a>
+	</div>
 
 </body>
 </html>

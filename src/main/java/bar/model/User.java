@@ -5,7 +5,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
 
-
 @Entity
 @XmlRootElement
 @Table(name = "USERS")
@@ -27,7 +26,8 @@ public class User implements Serializable {
 	private String email;
 
 	@Column
-	private String role;
+	@Enumerated(EnumType.STRING)
+	private Role role;
 
 	@Temporal(TemporalType.DATE)
 	private Date dateOfBirth;
@@ -82,11 +82,11 @@ public class User implements Serializable {
 		this.dateOfBirth = dateOfBirth;
 	}
 
-	public String getRole() {
+	public Role getRole() {
 		return role;
 	}
 
-	public void setRole(String role) {
+	public void setRole(Role role) {
 		this.role = role;
 	}
 
@@ -99,7 +99,7 @@ public class User implements Serializable {
 			result += ", password: " + password;
 		if (email != null && !email.trim().isEmpty())
 			result += ", email: " + email;
-		if (role != null && !role.trim().isEmpty())
+		if (role != null)
 			result += ", role: " + role;
 		return result;
 	}
