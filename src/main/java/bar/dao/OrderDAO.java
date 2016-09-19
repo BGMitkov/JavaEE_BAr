@@ -90,8 +90,9 @@ public class OrderDAO {
 		q.setParameter("endDate", endDate);
 		try {
 			return (float) q.getSingleResult();
-		} catch (Exception e) {
-			return (Float) null;
+		} 
+		catch (Exception e) {
+			return 0f;
 		}
 	}
 

@@ -30,8 +30,7 @@ public class DatabaseUtils {
                     new Date())};
 
     private static Item[] ITEMS = {
-            new Item("Chicken", "3.60",
-                    "Hot Meal", "Chicken fillet with 2 salads"),
+            new Item("Chicken", "3.60","Hot Meal", "Chicken fillet with 2 salads"),
             new Item("Zagorka", "1.60", "Beer", "Alcholic bavarage"),
             new Item("Smirnoff", "2", "Vodka", "Alcholic bavarage"),
             new Item("Smirnoff", "2", "Vodka", "Alcholic bavarage")};

@@ -11,6 +11,8 @@ import bar.utils.DatabaseUtils;
 /**
  * Session Bean implementation class TestDataInserter
  */
+
+
 @Singleton
 @Startup
 public class TestDataInserter {

@@ -9,10 +9,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import bar.dao.OrderDAO;
+import bar.model.DateContainer;
 
 
 @Stateless
-@Path("report")
+@Path("/report")
 public class ReportManager {
 	@Inject 
 	private OrderDAO orderDAO;
@@ -21,22 +22,25 @@ public class ReportManager {
 	
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
-	public String estimateProfitBetweenTwoDates( String Dates ) throws  Exception
+	public String estimateProfitBetweenTwoDates( DateContainer dates ) //throws  Exception
 	{
-		String d1=Dates.substring(1, 11);
-		String d2=Dates.substring(11, 21);
+		Date begDate = dates.getBegDate();
+	    Date endDate = dates.getEndDate();	 
 		
-		Date begDate=null;
-		Date endDate=null;
-		
-		
-			begDate =new SimpleDateFormat("yyyy/MM/dd").parse(d1);
-	    	
-			endDate =new SimpleDateFormat("yyyy/MM/dd").parse(d2);
-	    	 
-		
+	    try
+	    {
 		float f = orderDAO.estimateProfitBetweenTwoDates(begDate,endDate);
+		
 		return Float.toString(f);
+	    }
+	    
+	    catch(Exception e){
+	    	return null;
+	    }
+	    
+	    
+	    
+		//return dates.getBegDate().toString() +" -:- "+ dates.getEndDate().toString();
 	}
 
 
