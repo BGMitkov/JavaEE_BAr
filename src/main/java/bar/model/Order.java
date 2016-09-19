@@ -49,7 +49,6 @@ public class Order implements Serializable {
 	@Column(name = "tableNumber")
 	private String tableNumber;
 
-	@Column(name = "executor_id")
 	@ManyToOne
 	private User executor;
 
