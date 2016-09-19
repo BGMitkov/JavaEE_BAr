@@ -14,6 +14,7 @@ import bar.dao.OrderDAO;
 import bar.dao.UserDAO;
 import bar.model.Item;
 import bar.model.Order;
+import bar.model.Role;
 import bar.model.User;
 
 @Stateless
@@ -21,13 +22,13 @@ public class DatabaseUtils {
     
     private static User[] USERS = {
             new User("test", "test", "test.user@somemail.com",
-                    new Date()),
+                    new Date(), Role.Manager),
             new User("test2", "test2", "test2.user@somemail.com",
-                    new Date()),
+                    new Date(), Role.Manager),
             new User("Second User", "Test1234", "second.user@somemail.com",
-                    new Date()),
+                    new Date(), Role.Manager),
             new User("Third User", "98411TA", "third.user@somemail.com",
-                    new Date())};
+                    new Date(), Role.Manager)};
 
     private static Item[] ITEMS = {
             new Item("Chicken", "3.60",

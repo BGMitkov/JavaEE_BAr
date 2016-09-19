@@ -35,11 +35,12 @@ public class User implements Serializable {
 	public User() {
 	}
 
-	public User(String userName, String password, String email, Date dateOfBirth) {
+	public User(String userName, String password, String email, Date dateOfBirth, Role role) {
 		this.userName = userName;
 		this.password = password;
 		this.email = email;
 		this.dateOfBirth = dateOfBirth;
+		this.role = role;
 	}
 
 	public Long getId() {

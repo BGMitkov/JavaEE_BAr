@@ -1,5 +1,6 @@
 package bar.services;
 
+import java.net.HttpURLConnection;
 import java.util.Collection;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -13,6 +14,7 @@ import javax.ws.rs.core.Response;
 
 import bar.dao.ItemDAO;
 import bar.model.Item;
+import bar.model.Role;
 
 @Stateless
 @Path("item")
@@ -29,6 +31,9 @@ public class ItemManager {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addNewItem(Item newItem) {
+		if(context.getCurrentUser().getRole() != Role.Manager){
+			return Response.status(HttpURLConnection.HTTP_FORBIDDEN).build();
+		}
 		itemDAO.addItem(newItem);
 		return RESPONSE_OK;
 	}

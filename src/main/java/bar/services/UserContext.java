@@ -20,5 +20,4 @@ public class UserContext implements Serializable {
 	public void setCurrentUser(User currentUser) {
 		this.currentUser = currentUser;
 	}
-
 }
