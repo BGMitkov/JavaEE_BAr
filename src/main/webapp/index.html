@@ -86,7 +86,11 @@
 			itemsString += itemsInOrder.itemName + " 1x";
 		}
 		row.append($("<td>" + itemsString + "</td>"));
-		row.append($("<td>" + rowData.executor.userName + "</td>"));
+		if(rowData.executor != undefined){
+			row.append($("<td>" + rowData.executor.userName + "</td>"));
+		}else {
+			row.append($("<td>Not taken</td>"));
+		}
 		row.append($("<td>" + rowData.status + "</td>"));
 
 		if (isUserAuthenticated) {
@@ -94,6 +98,7 @@
 				var acceptTd = $("<td />");
 				var link = $("<button>Accept</button>");
 				link.attr("class", "buttonAccept");
+				row.append($("<td>-</td>"));
 				acceptTd.append(link);
 				row.append(acceptTd);
 				link.click(function() {
