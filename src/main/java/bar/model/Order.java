@@ -131,7 +131,7 @@ public class Order implements Serializable {
 		return totalPrice;
 	}
 
-	private void setTotalPrice(float totalPrice) {
+	public void setTotalPrice(float totalPrice) {
 		this.totalPrice = totalPrice;
 	}
 	

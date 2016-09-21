@@ -29,6 +29,9 @@ public class ReportManager {
 		Date begDate = dates.getBegDate();
 	    Date endDate = dates.getEndDate();	 
 		
+	    System.out.println(begDate.toString());
+	    System.out.println(endDate.toString());
+	    
 	    try
 	    {
 		float f = orderDAO.estimateProfitBetweenTwoDates(begDate,endDate);
@@ -38,11 +41,8 @@ public class ReportManager {
 	    
 	    catch(Exception e){
 	    	return null;
-	    }
-	    
-	    
-	    
-		//return dates.getBegDate().toString() +" -:- "+ dates.getEndDate().toString();
+	    } 
+		
 	}
 
 

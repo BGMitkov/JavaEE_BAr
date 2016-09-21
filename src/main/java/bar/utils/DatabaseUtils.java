@@ -37,10 +37,14 @@ public class DatabaseUtils {
 
     private static List<Item> order = Arrays.asList(ITEMS);
 
+    
+    
     private static Order[] ORDERS = {
     		new Order(order, "2"),
     		new Order(order, "3"),
     };
+    
+    
     
     @PersistenceContext
     private EntityManager em;
@@ -81,6 +85,7 @@ public class DatabaseUtils {
     
     private void addTestOrders() {
         for (Order order : ORDERS) {
+        	order.setDateOfAcceptance(new Date());order.setTotalPrice(150); // setTitalprice changed to public for this test
             orderDAO.addOrder(order);
         }
     }
