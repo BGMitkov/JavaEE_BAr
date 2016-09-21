@@ -30,13 +30,13 @@ $(document).ready(function() {
 
 function get_report() {
 	
-	   var formUrl = $("#report_form").attr("action");
+	    var formUrl = $("#report_form").attr("action");
 	   
 	    var begdate = $("#begdate")[0].value;
 	    var enddate = $("#enddate")[0].value;
 	  
+	   if (begdate=="" || enddate=="") {alert("Please specify dates"); return;}
 	   
-
        	var data={
        			
        			dateContainer : { begDate : begdate,
