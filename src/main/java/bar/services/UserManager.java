@@ -48,11 +48,11 @@ public class UserManager {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response loginUser(User user) {
-		boolean isUserValid = userDAO.validateUserCredentials(user.getUserName(), user.getPassword());
-		if (!isUserValid) {
+		User validUser = userDAO.validateUserCredentials(user.getUserName(), user.getPassword());
+		if (validUser == null) {
 			return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
 		}
-		context.setCurrentUser(user);
+		context.setCurrentUser(validUser);
 		return RESPONSE_OK;
 	}
 
