@@ -2,6 +2,8 @@ package bar.dao;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -107,4 +109,11 @@ public class OrderDAO {
 		}
 	}
 
+	public short getOrderActiveTime(Order overdueOrder) {
+		Order foundOrder = findById(overdueOrder.getOrderId());
+		Date currentDate = new Date();
+		long diff = currentDate.getTime() - foundOrder.getDateOfAcceptance().getTime();
+		short minutes = (short) Math.floor((diff/1000)/60);
+		return minutes;
+	}
 }

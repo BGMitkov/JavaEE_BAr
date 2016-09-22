@@ -23,10 +23,10 @@ public class DatabaseUtils {
     private static User[] USERS = {
             new User("test", "test", "test.user@somemail.com",
                     new Date(), Role.Manager),
-            new User("test2", "test2", "test2.user@somemail.com",
-                    new Date(), Role.Manager),
-            new User("Second User", "Test1234", "second.user@somemail.com",
-                    new Date(), Role.Manager),
+            new User("test2", "test", "test2.user@somemail.com",
+                    new Date(), Role.Waiter),
+            new User("test3", "test", "second.user@somemail.com",
+                    new Date(), Role.Barman),
             new User("Third User", "98411TA", "third.user@somemail.com",
                     new Date(), Role.Manager)};
 

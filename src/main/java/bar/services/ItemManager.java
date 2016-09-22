@@ -31,8 +31,8 @@ public class ItemManager {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addNewItem(Item newItem) {
-		if(context.getCurrentUser().getRole() != Role.Manager){
-			return Response.status(HttpURLConnection.HTTP_FORBIDDEN).build();
+		if(!context.isManager()){
+			return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
 		}
 		itemDAO.addItem(newItem);
 		return RESPONSE_OK;
@@ -42,7 +42,9 @@ public class ItemManager {
 	@GET
 	@Produces("application/json")
 	public Collection<Item> getAllItems() {
-
+		if(!context.isManager() && !context.isWaiter()){
+			return null;
+		}
 		return itemDAO.getAllItems();
 	}
 

@@ -10,7 +10,7 @@
 	isUserAuthenticated = false;
 	var allItems;
 	var listOfItemsToOrder = [];
-	
+
 	$(document).ready(function() {
 		$.ajax({
 			url : 'rest/user/authenticated',
@@ -48,6 +48,10 @@
 			type : "GET",
 			dataType : "json",
 			success : function(data) {
+				if (data == undefined) {
+					alert("UNAUTHORIZED access!");
+					return;
+				}
 				allItems = data.item;
 				console.log(allItems);
 				renderTable(data);
@@ -150,7 +154,12 @@
 			url : 'rest/order',
 			type : "POST",
 			contentType : "application/json;charset=UTF-8",
-			data : JSON.stringify(data)
+			data : JSON.stringify(data),
+			statusCode: {
+				401 : function() {
+					alert("You are not AUTHORIZED to make such request!");
+				}
+			}
 		}).success(function() {
 			$("#order_form").attr("action", "addingOrder.html");
 			alert("Order is made!");
@@ -161,7 +170,7 @@
 			$("#order_form").submit();
 		});
 	}
-	
+
 	function logout() {
 		$.ajax({
 			url : 'rest/user/logout',

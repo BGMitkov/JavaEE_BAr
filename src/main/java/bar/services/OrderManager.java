@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import bar.dao.OrderDAO;
 import bar.model.Order;
+import bar.model.Role;
 import bar.model.Status;
 
 @Stateless
@@ -35,6 +36,9 @@ public class OrderManager {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response order(Order newOrder) {
+		if (!context.isManager() && !context.isWaiter()) {
+			return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
+		}
 		newOrder.setDateOfOrder(new Date());
 		newOrder.calculateTotalPrice();
 		newOrder.setStatus(Status.WAITING);
@@ -44,8 +48,11 @@ public class OrderManager {
 
 	@Path("/waiting")
 	@GET
-	@Produces("application/json")	
+	@Produces("application/json")
 	public Collection<Order> getAllWaitingOrders() {
+		if (!context.isManager() && !context.isBarman()) {
+			return null;
+		}
 		return orderDAO.getAllWaitingOrders();
 	}
 
@@ -53,6 +60,9 @@ public class OrderManager {
 	@GET
 	@Produces("application/json")
 	public Collection<Order> getCurrentUserOrders() {
+		if (!context.isManager() && !context.isBarman()) {
+			return null;
+		}
 		return orderDAO.getCurrentUserOrders(context.getCurrentUser());
 	}
 
@@ -60,18 +70,20 @@ public class OrderManager {
 	@Path("/accept")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsAccepted(@QueryParam("orderId") String orderId) {
+		if (!context.isManager() && !context.isBarman()) {
+			return null;
+		}
 		Order orderToAccept = orderDAO.findById(Long.parseLong(orderId));
-		if(orderToAccept != null) {
-			if(orderToAccept.getExecutor() == null){
-				orderDAO.setOrderAsAccepted(orderToAccept,context.getCurrentUser());
+		if (orderToAccept != null) {
+			if (orderToAccept.getExecutor() == null) {
+				orderDAO.setOrderAsAccepted(orderToAccept, context.getCurrentUser());
 				return Response.status(HttpURLConnection.HTTP_OK).build();
-			}
-			else {
+			} else {
 				return Response.status(HttpURLConnection.HTTP_CONFLICT).build();
 			}
 		}
 		return Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
-		
+
 	}
 
 	@PUT
@@ -79,33 +91,36 @@ public class OrderManager {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsOverdue(@QueryParam("orderId") String orderId) {
 		Order orderOverdue = orderDAO.findById(Long.parseLong(orderId));
-		if(orderOverdue != null) {
-			if(orderOverdue.getStatus() != Status.OVERDUE){
-				orderDAO.setOrderAsOverdue(orderOverdue);
-				return Response.status(HttpURLConnection.HTTP_OK).build();
-			}
-			else {
+		if (orderOverdue != null) {
+			if (orderOverdue.getStatus() == Status.ACCEPTED) {
+				short minutes = orderDAO.getOrderActiveTime(orderOverdue);
+				if (minutes >= 0) {
+					orderDAO.setOrderAsOverdue(orderOverdue);
+					return Response.status(HttpURLConnection.HTTP_OK).build();
+				} else {
+					return Response.status(HttpURLConnection.HTTP_NOT_ACCEPTABLE).build();
+				}
+			} else {
 				return Response.status(HttpURLConnection.HTTP_CONFLICT).build();
 			}
 		}
 		return Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
 	}
-	
+
 	@PUT
 	@Path("/complete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsComplete(@QueryParam("orderId") String orderId) {
 		Order orderCompleted = orderDAO.findById(Long.parseLong(orderId));
-		if(orderCompleted != null) {
-			if(orderCompleted.getStatus() != Status.COMPLETE && orderCompleted.getStatus() != Status.OVERDUE_COMPLETED){
+		if (orderCompleted != null) {
+			if (orderCompleted.getStatus() != Status.COMPLETE
+					&& orderCompleted.getStatus() != Status.OVERDUE_COMPLETED) {
 				orderDAO.setOrderAsCompleted(orderCompleted);
 				return Response.status(HttpURLConnection.HTTP_OK).build();
-			}
-			else {
+			} else {
 				return Response.status(HttpURLConnection.HTTP_NOT_MODIFIED).build();
 			}
-		}
-		else {
+		} else {
 			return Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
 		}
 	}

@@ -171,6 +171,9 @@
 							200 : function() {
 								alert("Order " + rowData.orderId + " is overdue!");
 								drawTableWithOrders();
+							},
+							406 : function() {
+								alert("Order " + rowData.orderId + " duration has not exceeded 5 minutes!")
 							}
 						}
 					});
