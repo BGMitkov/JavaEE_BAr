@@ -19,7 +19,11 @@ import bar.model.User;
 public class UserManager {
 
 	private static final Response RESPONSE_OK = Response.ok().build();
-
+	private static final Response RESPONSE_UNAUTHORIZED = Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
+	private static final Response RESPONSE_BAD_REQUEST = Response.status(HttpURLConnection.HTTP_BAD_REQUEST).build();
+	private static final Response RESPONSE_CONFLICT = Response.status(HttpURLConnection.HTTP_CONFLICT).build();
+	private static final Response RESPONSE_NOT_FOUND = Response.status(HttpURLConnection.HTTP_NOT_FOUND).build();
+	
 	@Inject
 	private UserDAO userDAO;
 
@@ -29,15 +33,17 @@ public class UserManager {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerUser(User newUser) {
-
+		if(!context.isManager()){
+			return RESPONSE_UNAUTHORIZED;
+		}
 		boolean userNameExists = userDAO.userNameExists(newUser.getUserName());
 		boolean emailExists = userDAO.emailExists(newUser.getEmail());
 
 		if (userNameExists) {
-			return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).build();
+			return RESPONSE_BAD_REQUEST;
 		}
 		if (emailExists) {
-			return Response.status(HttpURLConnection.HTTP_CONFLICT).build();
+			return RESPONSE_CONFLICT;
 		}
 
 		userDAO.addUser(newUser);
@@ -50,7 +56,7 @@ public class UserManager {
 	public Response loginUser(User user) {
 		User validUser = userDAO.validateUserCredentials(user.getUserName(), user.getPassword());
 		if (validUser == null) {
-			return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
+			return RESPONSE_UNAUTHORIZED;
 		}
 		context.setCurrentUser(validUser);
 		return RESPONSE_OK;
@@ -61,7 +67,7 @@ public class UserManager {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response isAuthenticated() {
 		if (context.getCurrentUser() == null) {
-			return Response.status(HttpURLConnection.HTTP_NOT_FOUND).build();
+			return RESPONSE_NOT_FOUND;
 		}
 		return RESPONSE_OK;
 	}

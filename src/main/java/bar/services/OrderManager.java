@@ -25,8 +25,13 @@ import bar.model.Status;
 @Path("order")
 public class OrderManager {
 
-	private static final Response RESPONSE_OK = Response.ok().build();
-
+	private static final Response RESPONSE_OK = Response.status(HttpURLConnection.HTTP_OK).build();
+	private static final Response RESPONSE_UNAUTHORIZED = Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
+	private static final Response RESPONSE_NO_CONTENT = Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
+	private static final Response RESPONSE_CONFLICT = Response.status(HttpURLConnection.HTTP_CONFLICT).build();
+	private static final Response RESPONSE_NOT_ACCEPTABLE = Response.status(HttpURLConnection.HTTP_NOT_ACCEPTABLE).build();
+	private static final Response RESPONSE_NOT_MODIFIED = Response.status(HttpURLConnection.HTTP_NOT_MODIFIED).build();
+	
 	@Inject
 	private OrderDAO orderDAO;
 
@@ -37,13 +42,13 @@ public class OrderManager {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response order(Order newOrder) {
 		if (!context.isManager() && !context.isWaiter()) {
-			return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
+			return RESPONSE_UNAUTHORIZED;
 		}
 		newOrder.setDateOfOrder(new Date());
 		newOrder.calculateTotalPrice();
 		newOrder.setStatus(Status.WAITING);
 		orderDAO.addOrder(newOrder);
-		return RESPONSE_OK;
+		return Response.ok().build();
 	}
 
 	@Path("/waiting")
@@ -71,18 +76,18 @@ public class OrderManager {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsAccepted(@QueryParam("orderId") String orderId) {
 		if (!context.isManager() && !context.isBarman()) {
-			return null;
+			return RESPONSE_UNAUTHORIZED;
 		}
 		Order orderToAccept = orderDAO.findById(Long.parseLong(orderId));
 		if (orderToAccept != null) {
 			if (orderToAccept.getExecutor() == null) {
 				orderDAO.setOrderAsAccepted(orderToAccept, context.getCurrentUser());
-				return Response.status(HttpURLConnection.HTTP_OK).build();
+				return RESPONSE_OK;
 			} else {
-				return Response.status(HttpURLConnection.HTTP_CONFLICT).build();
+				return RESPONSE_CONFLICT;
 			}
 		}
-		return Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
+		return RESPONSE_NO_CONTENT;
 
 	}
 
@@ -90,38 +95,44 @@ public class OrderManager {
 	@Path("/overdue")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsOverdue(@QueryParam("orderId") String orderId) {
+		if(!context.isManager() && !context.isBarman()){
+			return RESPONSE_UNAUTHORIZED;
+		}
 		Order orderOverdue = orderDAO.findById(Long.parseLong(orderId));
 		if (orderOverdue != null) {
 			if (orderOverdue.getStatus() == Status.ACCEPTED) {
 				short minutes = orderDAO.getOrderActiveTime(orderOverdue);
 				if (minutes >= 0) {
 					orderDAO.setOrderAsOverdue(orderOverdue);
-					return Response.status(HttpURLConnection.HTTP_OK).build();
+					return RESPONSE_OK;
 				} else {
-					return Response.status(HttpURLConnection.HTTP_NOT_ACCEPTABLE).build();
+					return RESPONSE_NOT_ACCEPTABLE;
 				}
 			} else {
-				return Response.status(HttpURLConnection.HTTP_CONFLICT).build();
+				return RESPONSE_CONFLICT;
 			}
 		}
-		return Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
+		return RESPONSE_NO_CONTENT;
 	}
 
 	@PUT
 	@Path("/complete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsComplete(@QueryParam("orderId") String orderId) {
+		if(!context.isManager() && !context.isBarman()){
+			return RESPONSE_UNAUTHORIZED;
+		}
 		Order orderCompleted = orderDAO.findById(Long.parseLong(orderId));
 		if (orderCompleted != null) {
-			if (orderCompleted.getStatus() != Status.COMPLETE
-					&& orderCompleted.getStatus() != Status.OVERDUE_COMPLETED) {
+			if (orderCompleted.getStatus() == Status.ACCEPTED
+					|| orderCompleted.getStatus() != Status.OVERDUE) {
 				orderDAO.setOrderAsCompleted(orderCompleted);
-				return Response.status(HttpURLConnection.HTTP_OK).build();
+				return RESPONSE_OK;
 			} else {
-				return Response.status(HttpURLConnection.HTTP_NOT_MODIFIED).build();
+				return RESPONSE_NOT_MODIFIED;
 			}
 		} else {
-			return Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
+			return RESPONSE_NO_CONTENT;
 		}
 	}
 }

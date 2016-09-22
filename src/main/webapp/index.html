@@ -112,6 +112,10 @@
 								alert("Order already taken!");
 								drawTableWithOrders();
 							},
+							401 : function() {
+								alert("UNAUTHORIZED change to order!");
+								drawTableWithOrders();
+							},
 							204 : function(){
 								alert("Order not found!");
 								drawTableWithOrders();
@@ -140,6 +144,10 @@
 						type : "PUT",
 						dataType : "json",
 						statusCode : {
+							401 : function() {
+								alert("UNAUTHORIZED change to order!");
+								drawTableWithOrders();
+							},
 							304 : function() {
 								alert("Order already completed!");
 								drawTableWithOrders();
@@ -162,6 +170,10 @@
 						statusCode : {
 							409 : function() {
 								alert("Order already is overdue!");
+								drawTableWithOrders();
+							},
+							401 : function() {
+								alert("UNAUTHORIZED change to order!");
 								drawTableWithOrders();
 							},
 							204 : function() {

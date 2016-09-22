@@ -21,6 +21,7 @@ import bar.model.Role;
 public class ItemManager {
 
 	private static final Response RESPONSE_OK = Response.ok().build();
+	private static final Response RESPONSE_UNAUTHORIZED = Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
 
 	@Inject
 	private ItemDAO itemDAO;
@@ -32,7 +33,7 @@ public class ItemManager {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addNewItem(Item newItem) {
 		if(!context.isManager()){
-			return Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
+			return RESPONSE_UNAUTHORIZED;
 		}
 		itemDAO.addItem(newItem);
 		return RESPONSE_OK;

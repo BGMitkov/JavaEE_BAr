@@ -84,6 +84,10 @@
 					alert("Email already in use!");
 					$("#reset_register").trigger("click");
 				},
+				401 : function() {
+					alert("UNAUTHORIZED registration!");
+					$("#reset_register").trigger("click");
+				},
 				400 : function() {
 					alert("Username already in use!");
 					$("#reset_register").trigger("click");
