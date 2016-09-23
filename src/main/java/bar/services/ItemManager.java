@@ -32,7 +32,7 @@ public class ItemManager {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addNewItem(Item newItem) {
-		if(!context.isManager()){
+		if(!context.isUserInRole(Role.Manager)){
 			return RESPONSE_UNAUTHORIZED;
 		}
 		itemDAO.addItem(newItem);
@@ -43,7 +43,7 @@ public class ItemManager {
 	@GET
 	@Produces("application/json")
 	public Collection<Item> getAllItems() {
-		if(!context.isManager() && !context.isWaiter()){
+		if(!context.isUserInRole(Role.Manager, Role.Waiter)){
 			return null;
 		}
 		return itemDAO.getAllItems();

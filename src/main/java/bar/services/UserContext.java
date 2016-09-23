@@ -21,16 +21,15 @@ public class UserContext implements Serializable {
 	public void setCurrentUser(User currentUser) {
 		this.currentUser = currentUser;
 	}
-	
-	public boolean isManager(){
-		return currentUser.getRole() == Role.Manager;
-	}
-	
-	public boolean isBarman(){
-		return currentUser.getRole() == Role.Barman;
-	}
-	
-	public boolean isWaiter(){
-		return currentUser.getRole() == Role.Waiter;
+
+	public boolean isUserInRole(Role... roles) {
+		if (currentUser != null) {
+			for (Role role : roles) {
+				if (currentUser.getRole() == role) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 }

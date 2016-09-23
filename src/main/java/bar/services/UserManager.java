@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import bar.dao.UserDAO;
+import bar.model.Role;
 import bar.model.User;
 
 @Stateless
@@ -33,7 +34,7 @@ public class UserManager {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response registerUser(User newUser) {
-		if(!context.isManager()){
+		if(!context.isUserInRole(Role.Manager)){
 			return RESPONSE_UNAUTHORIZED;
 		}
 		boolean userNameExists = userDAO.userNameExists(newUser.getUserName());
@@ -72,7 +73,6 @@ public class UserManager {
 		return RESPONSE_OK;
 	}
 
-	// Ползва ли се във jquery?
 	@Path("current")
 	@GET
 	@Consumes(MediaType.TEXT_PLAIN)

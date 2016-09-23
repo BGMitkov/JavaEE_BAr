@@ -23,7 +23,6 @@
 				}
 			}
 		});
-		
 		drawTableWithOrders();
 
 		$.ajax({
@@ -46,7 +45,7 @@
 			dataType : "json",
 			success : function(data) {
 				console.log(data);
-				if (data != null) {
+				if (typeof data != 'undefined') {
 					renderTable(data);
 				} else {
 					alert("Access to orders forbidden!");

@@ -41,7 +41,7 @@ public class OrderManager {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response order(Order newOrder) {
-		if (!context.isManager() && !context.isWaiter()) {
+		if (!context.isUserInRole(Role.Manager, Role.Waiter)) {
 			return RESPONSE_UNAUTHORIZED;
 		}
 		newOrder.setDateOfOrder(new Date());
@@ -55,7 +55,7 @@ public class OrderManager {
 	@GET
 	@Produces("application/json")
 	public Collection<Order> getAllWaitingOrders() {
-		if (!context.isManager() && !context.isBarman()) {
+		if (!context.isUserInRole(Role.Manager, Role.Barman)) {
 			return null;
 		}
 		return orderDAO.getAllWaitingOrders();
@@ -65,7 +65,7 @@ public class OrderManager {
 	@GET
 	@Produces("application/json")
 	public Collection<Order> getCurrentUserOrders() {
-		if (!context.isManager() && !context.isBarman()) {
+		if (!context.isUserInRole(Role.Manager, Role.Barman)) {
 			return null;
 		}
 		return orderDAO.getCurrentUserOrders(context.getCurrentUser());
@@ -75,7 +75,7 @@ public class OrderManager {
 	@Path("/accept")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsAccepted(@QueryParam("orderId") String orderId) {
-		if (!context.isManager() && !context.isBarman()) {
+		if (!context.isUserInRole(Role.Manager, Role.Barman)) {
 			return RESPONSE_UNAUTHORIZED;
 		}
 		Order orderToAccept = orderDAO.findById(Long.parseLong(orderId));
@@ -95,7 +95,7 @@ public class OrderManager {
 	@Path("/overdue")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsOverdue(@QueryParam("orderId") String orderId) {
-		if(!context.isManager() && !context.isBarman()){
+		if(!context.isUserInRole(Role.Manager, Role.Barman)){
 			return RESPONSE_UNAUTHORIZED;
 		}
 		Order orderOverdue = orderDAO.findById(Long.parseLong(orderId));
@@ -119,7 +119,7 @@ public class OrderManager {
 	@Path("/complete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsComplete(@QueryParam("orderId") String orderId) {
-		if(!context.isManager() && !context.isBarman()){
+		if(!context.isUserInRole(Role.Manager, Role.Barman)){
 			return RESPONSE_UNAUTHORIZED;
 		}
 		Order orderCompleted = orderDAO.findById(Long.parseLong(orderId));
