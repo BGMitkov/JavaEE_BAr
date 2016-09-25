@@ -104,7 +104,7 @@ public class OrderManager {
 		if (orderOverdue != null) {
 			if (orderOverdue.getStatus() == Status.ACCEPTED) {
 				short minutes = orderDAO.getOrderActiveTime(orderOverdue);
-				if (minutes >= 0) {
+				if (minutes >= 5) {
 					orderDAO.setOrderAsOverdue(orderOverdue);
 					return RESPONSE_OK;
 				} else {

@@ -23,7 +23,7 @@
 				}
 			}
 		});
-		
+
 		drawTables();
 
 		$.ajax({
@@ -43,14 +43,13 @@
 		drawTableWithOrders();
 		drawTableWithCurrentOrders();
 	}
-	
+
 	function drawTableWithOrders() {
 		$.ajax({
 			url : 'rest/order/waiting',
 			type : "GET",
 			dataType : "json",
 			success : function(data) {
-				console.log(data);
 				if (typeof data != 'undefined') {
 					renderTable(data);
 				} else {
@@ -66,7 +65,6 @@
 			type : "GET",
 			dataType : "json",
 			success : function(data) {
-				console.log(data);
 				if (typeof data != 'undefined') {
 					renderTableWithCurrentOrders(data);
 				} else {
@@ -100,11 +98,10 @@
 		row.append($("<td>" + toStringItems(rowData.itemsInOrder) + "</td>"));
 
 		row.append($("<td>" + rowData.status + "</td>"));
-		console.log("rendering current row!");
 		if (isUserAuthenticated) {
-			console.log("addcomplete button")
 			addCompleteButton(row, rowData);
-			if (rowData.status === "ACCEPTED" && calculateOrderDuration(rowData.dateOfAcceptance) >= 0) {
+			if (rowData.status === "ACCEPTED"
+					&& calculateOrderDuration(rowData.dateOfAcceptance) >= 5) {
 				setOrderAsOverdue(rowData);
 			}
 		} else {
@@ -199,8 +196,8 @@
 	}
 
 	function addCompleteButton(row, rowData) {
-		console.log("adding complete button");
-		row.append($("<td>" + calculateOrderDuration(rowData.dateOfAcceptance) + "</td>"));
+		row.append($("<td>" + calculateOrderDuration(rowData.dateOfAcceptance)
+				+ "</td>"));
 		var acceptTd = $("<td />");
 		var link = $("<button>Complete</button>");
 		link.attr("class", "buttonComplete");
@@ -262,7 +259,7 @@
 			}
 		});
 	}
-	
+
 	function calculateOrderDuration(dateOfAcceptance) {
 		var currentDate = new Date();
 		var date = new Date(dateOfAcceptance);
@@ -284,29 +281,37 @@
 	</div>
 	<hr>
 	<div>
-		<table id="orders_table" class="table">
-			<tr>
-				<th>Id</th>
-				<th>Items</th>
-				<th>Status</th>
-				<th>Action</th>
-			</tr>
-		</table>
+		<div class="table_with_orders_div">
+			<div align="center">
+				<h2>Waiting</h2>
+			</div>
+			<div>
+				<table id="orders_table" class="table">
+					<tr>
+						<th>Id</th>
+						<th>Items</th>
+						<th>Status</th>
+						<th>Action</th>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div class="table_with_orders_div">
+			<div align="center">
+				<h2>Accepted</h2>
+			</div>
+			<div>
+				<table id="current_orders_table" class="table">
+					<tr>
+						<th>Id</th>
+						<th>Items</th>
+						<th>Status</th>
+						<th>Action</th>
+					</tr>
+				</table>
+			</div>
+		</div>
 	</div>
-	<div align="center">
-		<h1>Current</h1>
-	</div>
-	<div>
-		<table id="current_orders_table" class="table">
-			<tr>
-				<th>Id</th>
-				<th>Items</th>
-				<th>Status</th>
-				<th>Action</th>
-			</tr>
-		</table>
-	</div>
-
 	<div class="login_register">
 		<a href="login.html" class="login_form"> Log in </a> <a
 			href="register.html" class="login_form"> Register </a>

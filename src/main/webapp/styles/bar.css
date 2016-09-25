@@ -8,8 +8,13 @@
 	display: block;
 	width : 100px;
 }
-.table_div{
-	display:none;
+.table_div {
+	display: none;
+}
+.table_with_orders_div {
+	display: block;
+	width: 50%;
+	float : left;
 }
 .item_order{
 	position: absolute;
@@ -47,6 +52,7 @@
 	margin-left: 25%;
 	margin-right: 25%;
 }
+
 #register_form {
 	display: block;
 	width: 50%;
