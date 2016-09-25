@@ -31,8 +31,7 @@ public class OrderDAO {
 
 	public Collection<Order> getAllWaitingOrders() {
 		TypedQuery<Order> query = em.createNamedQuery("findByStatus", Order.class)
-				.setParameter("status1", Status.WAITING).setParameter("status2", Status.OVERDUE)
-				.setParameter("status3", Status.ACCEPTED);
+				.setParameter("status", Status.WAITING);
 		Collection<Order> orders;
 		try {
 			orders = query.getResultList();
@@ -41,21 +40,24 @@ public class OrderDAO {
 		}
 		for (Order order : orders) {
 			order.setItemsInOrder(order.getItemsInOrder());
-			if(order.getExecutor() == null)
-			order.setExecutor(order.getExecutor());
 		}
 		return orders;
 	}
 
 	public Collection<Order> getCurrentUserOrders(User user) {
 		TypedQuery<Order> query = em.createNamedQuery("getAcceptedAndOverdue", Order.class)
-				.setParameter("executor", user.getUserName()).setParameter("status1", Status.ACCEPTED)
+				.setParameter("executor", user).setParameter("status1", Status.ACCEPTED)
 				.setParameter("status2", Status.OVERDUE);
+		Collection<Order> orders;
 		try {
-			return query.getResultList();
+			orders = query.getResultList();
 		} catch (NoResultException e) {
 			return null;
 		}
+		for (Order order : orders) {
+			order.setItemsInOrder(order.getItemsInOrder());
+		}
+		return orders;
 	}
 
 	public Order findById(long key) {

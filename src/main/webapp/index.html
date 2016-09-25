@@ -23,7 +23,8 @@
 				}
 			}
 		});
-		drawTableWithOrders();
+		
+		drawTables();
 
 		$.ajax({
 			url : 'rest/user/current',
@@ -38,6 +39,11 @@
 		});
 	});
 
+	function drawTables() {
+		drawTableWithOrders();
+		drawTableWithCurrentOrders();
+	}
+	
 	function drawTableWithOrders() {
 		$.ajax({
 			url : 'rest/order/waiting',
@@ -48,11 +54,26 @@
 				if (typeof data != 'undefined') {
 					renderTable(data);
 				} else {
-					alert("Access to orders forbidden!");
 					return;
 				}
 			}
 		});
+	}
+
+	function drawTableWithCurrentOrders() {
+		$.ajax({
+			url : 'rest/order/current',
+			type : "GET",
+			dataType : "json",
+			success : function(data) {
+				console.log(data);
+				if (typeof data != 'undefined') {
+					renderTableWithCurrentOrders(data);
+				} else {
+					return;
+				}
+			}
+		})
 	}
 
 	function renderTable(data) {
@@ -63,17 +84,65 @@
 		}
 	}
 
+	function renderTableWithCurrentOrders(data) {
+		$("#current_orders_table tr").remove();
+		var orders = data.order;
+		for (var i = 0; i < orders.length; i++) {
+			renderCurrentRow(orders[i]);
+		}
+	}
+
+	function renderCurrentRow(rowData) {
+		var row = $("<tr />");
+		$("#current_orders_table").append(row);
+		row.append($("<td>" + rowData.orderId + "</td>"));
+
+		row.append($("<td>" + toStringItems(rowData.itemsInOrder) + "</td>"));
+
+		row.append($("<td>" + rowData.status + "</td>"));
+		console.log("rendering current row!");
+		if (isUserAuthenticated) {
+			console.log("addcomplete button")
+			addCompleteButton(row, rowData);
+			if (rowData.status === "ACCEPTED" && calculateOrderDuration(rowData.dateOfAcceptance) >= 0) {
+				setOrderAsOverdue(rowData);
+			}
+		} else {
+			row.append($("<td/>"));
+		}
+	}
+
 	function renderRow(rowData) {
 		var row = $("<tr />");
 		$("#orders_table").append(row);
 		row.append($("<td>" + rowData.orderId + "</td>"));
+
+		row.append($("<td>" + toStringItems(rowData.itemsInOrder) + "</td>"));
+
+		row.append($("<td>" + rowData.status + "</td>"));
+
+		if (isUserAuthenticated) {
+			addAcceptButton(row, rowData);
+		} else {
+			row.append($("<td/>"));
+		}
+	}
+
+	function getExecutorName(executor) {
+		if (executor != undefined) {
+			return executor.userName;
+		} else {
+			return "Not taken";
+		}
+	}
+
+	function toStringItems(itemsInOrder) {
 		var itemsString = "";
-		var itemsInOrder = rowData.itemsInOrder;
-		if(itemsInOrder.constructor === Array){
-			for(var i = 0; i < itemsInOrder.length; i++) {
+		if (itemsInOrder.constructor === Array) {
+			for (var i = 0; i < itemsInOrder.length; i++) {
 				var count = 1;
-				for(var j = i + 1; j < itemsInOrder.length; j++) {
-					if(itemsInOrder[i].itemName === itemsInOrder[j].itemName){
+				for (var j = i + 1; j < itemsInOrder.length; j++) {
+					if (itemsInOrder[i].itemName === itemsInOrder[j].itemName) {
 						count++;
 						itemsInOrder.splice(j, 1);
 						j--;
@@ -81,118 +150,10 @@
 				}
 				itemsString += itemsInOrder[i].itemName + " " + count + "x, ";
 			}
-		}
-		else {
+		} else {
 			itemsString += itemsInOrder.itemName + " 1x";
 		}
-		row.append($("<td>" + itemsString + "</td>"));
-		if(rowData.executor != undefined){
-			row.append($("<td>" + rowData.executor.userName + "</td>"));
-		}else {
-			row.append($("<td>Not taken</td>"));
-		}
-		row.append($("<td>" + rowData.status + "</td>"));
-
-		if (isUserAuthenticated) {
-			if(rowData.status === "WAITING") {
-				var acceptTd = $("<td />");
-				var link = $("<button>Accept</button>");
-				link.attr("class", "buttonAccept");
-				row.append($("<td>-</td>"));
-				acceptTd.append(link);
-				row.append(acceptTd);
-				link.click(function() {
-					$.ajax({
-						url : 'rest/order/accept?orderId=' + rowData.orderId,
-						type : "PUT",
-						dataType : "json",
-						statusCode: {
-							409 : function() {
-								alert("Order already taken!");
-								drawTableWithOrders();
-							},
-							401 : function() {
-								alert("UNAUTHORIZED change to order!");
-								drawTableWithOrders();
-							},
-							204 : function(){
-								alert("Order not found!");
-								drawTableWithOrders();
-							},
-							200 : function() {
-								drawTableWithOrders();
-							}
-						}
-					});
-				});
-			}
-			else if(rowData.status === "ACCEPTED" || rowData.status === "OVERDUE") {
-				var currentDate = new Date();
-				var date = new Date(rowData.dateOfAcceptance);
-				var diff = Math.abs(currentDate - date);
-				var minutes = Math.floor((diff/1000)/60);
-				row.append($("<td>" + minutes + "</td>"));
-				var acceptTd = $("<td />");
-				var link = $("<button>Complete</button>");
-				link.attr("class", "buttonComplete");
-				acceptTd.append(link);
-				row.append(acceptTd);
-				link.click(function() {
-					$.ajax({
-						url : 'rest/order/complete?orderId=' + rowData.orderId,
-						type : "PUT",
-						dataType : "json",
-						statusCode : {
-							401 : function() {
-								alert("UNAUTHORIZED change to order!");
-								drawTableWithOrders();
-							},
-							304 : function() {
-								alert("Order already completed!");
-								drawTableWithOrders();
-							},
-							204 : function() {
-								alert("Order not found!");
-								drawTableWithOrders();
-							},
-							200 : function() {
-								drawTableWithOrders();
-							}
-						}
-					});
-				});
-				if(rowData.status === "ACCEPTED" && minutes >= 0) {
-					$.ajax({
-						url : 'rest/order/overdue?orderId=' + rowData.orderId,
-						type : "PUT",
-						dataType : "json",
-						statusCode : {
-							409 : function() {
-								alert("Order already is overdue!");
-								drawTableWithOrders();
-							},
-							401 : function() {
-								alert("UNAUTHORIZED change to order!");
-								drawTableWithOrders();
-							},
-							204 : function() {
-								alert("Order not found!");
-								drawTableWithOrders();
-							},
-							200 : function() {
-								alert("Order " + rowData.orderId + " is overdue!");
-								drawTableWithOrders();
-							},
-							406 : function() {
-								alert("Order " + rowData.orderId + " duration has not exceeded 5 minutes!")
-							}
-						}
-					});
-				}
-			}
-		} else {
-			row.append($("<td/>"));
-		}
+		return itemsString;
 	}
 
 	function logout() {
@@ -203,6 +164,111 @@
 		}).always(function(data) {
 			window.location.replace("login.html");
 		});
+	}
+
+	function addAcceptButton(row, rowData) {
+		var acceptTd = $("<td />");
+		var link = $("<button>Accept</button>");
+		link.attr("class", "buttonAccept");
+		acceptTd.append(link);
+		row.append(acceptTd);
+		link.click(function() {
+			$.ajax({
+				url : 'rest/order/accept?orderId=' + rowData.orderId,
+				type : "PUT",
+				dataType : "json",
+				statusCode : {
+					409 : function() {
+						alert("Order already taken!");
+						drawTables();
+					},
+					401 : function() {
+						alert("UNAUTHORIZED change to order!");
+						drawTables();
+					},
+					204 : function() {
+						alert("Order not found!");
+						drawTables();
+					},
+					200 : function() {
+						drawTables();
+					}
+				}
+			});
+		});
+	}
+
+	function addCompleteButton(row, rowData) {
+		console.log("adding complete button");
+		row.append($("<td>" + calculateOrderDuration(rowData.dateOfAcceptance) + "</td>"));
+		var acceptTd = $("<td />");
+		var link = $("<button>Complete</button>");
+		link.attr("class", "buttonComplete");
+		acceptTd.append(link);
+		row.append(acceptTd);
+		link.click(function() {
+			$.ajax({
+				url : 'rest/order/complete?orderId=' + rowData.orderId,
+				type : "PUT",
+				dataType : "json",
+				statusCode : {
+					401 : function() {
+						alert("UNAUTHORIZED change to order!");
+						drawTables();
+					},
+					304 : function() {
+						alert("Order already completed!");
+						drawTables();
+					},
+					204 : function() {
+						alert("Order not found!");
+						drawTables();
+					},
+					200 : function() {
+						drawTables();
+					}
+				}
+			});
+		});
+	}
+
+	function setOrderAsOverdue(rowData) {
+		$.ajax({
+			url : 'rest/order/overdue?orderId=' + rowData.orderId,
+			type : "PUT",
+			dataType : "json",
+			statusCode : {
+				409 : function() {
+					alert("Order already is overdue!");
+					drawTables();
+				},
+				401 : function() {
+					alert("UNAUTHORIZED change to order!");
+					drawTables();
+				},
+				204 : function() {
+					alert("Order not found!");
+					drawTables();
+				},
+				200 : function() {
+					alert("Order " + rowData.orderId + " is overdue!");
+					drawTables();
+				},
+				406 : function() {
+					alert("Order " + rowData.orderId
+							+ " duration has not exceeded 5 minutes!");
+					drawTables();
+				}
+			}
+		});
+	}
+	
+	function calculateOrderDuration(dateOfAcceptance) {
+		var currentDate = new Date();
+		var date = new Date(dateOfAcceptance);
+		var diff = Math.abs(currentDate - date);
+		var minutes = Math.floor((diff / 1000) / 60);
+		return minutes;
 	}
 </script>
 
@@ -221,7 +287,20 @@
 		<table id="orders_table" class="table">
 			<tr>
 				<th>Id</th>
-				<th>Executor</th>
+				<th>Items</th>
+				<th>Status</th>
+				<th>Action</th>
+			</tr>
+		</table>
+	</div>
+	<div align="center">
+		<h1>Current</h1>
+	</div>
+	<div>
+		<table id="current_orders_table" class="table">
+			<tr>
+				<th>Id</th>
+				<th>Items</th>
 				<th>Status</th>
 				<th>Action</th>
 			</tr>

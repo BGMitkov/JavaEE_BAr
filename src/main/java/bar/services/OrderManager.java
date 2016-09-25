@@ -29,9 +29,10 @@ public class OrderManager {
 	private static final Response RESPONSE_UNAUTHORIZED = Response.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
 	private static final Response RESPONSE_NO_CONTENT = Response.status(HttpURLConnection.HTTP_NO_CONTENT).build();
 	private static final Response RESPONSE_CONFLICT = Response.status(HttpURLConnection.HTTP_CONFLICT).build();
-	private static final Response RESPONSE_NOT_ACCEPTABLE = Response.status(HttpURLConnection.HTTP_NOT_ACCEPTABLE).build();
+	private static final Response RESPONSE_NOT_ACCEPTABLE = Response.status(HttpURLConnection.HTTP_NOT_ACCEPTABLE)
+			.build();
 	private static final Response RESPONSE_NOT_MODIFIED = Response.status(HttpURLConnection.HTTP_NOT_MODIFIED).build();
-	
+
 	@Inject
 	private OrderDAO orderDAO;
 
@@ -61,7 +62,7 @@ public class OrderManager {
 		return orderDAO.getAllWaitingOrders();
 	}
 
-	@Path("/orders")
+	@Path("/current")
 	@GET
 	@Produces("application/json")
 	public Collection<Order> getCurrentUserOrders() {
@@ -69,6 +70,7 @@ public class OrderManager {
 			return null;
 		}
 		return orderDAO.getCurrentUserOrders(context.getCurrentUser());
+		
 	}
 
 	@PUT
@@ -95,7 +97,7 @@ public class OrderManager {
 	@Path("/overdue")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsOverdue(@QueryParam("orderId") String orderId) {
-		if(!context.isUserInRole(Role.Manager, Role.Barman)){
+		if (!context.isUserInRole(Role.Manager, Role.Barman)) {
 			return RESPONSE_UNAUTHORIZED;
 		}
 		Order orderOverdue = orderDAO.findById(Long.parseLong(orderId));
@@ -119,13 +121,12 @@ public class OrderManager {
 	@Path("/complete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response setOrderAsComplete(@QueryParam("orderId") String orderId) {
-		if(!context.isUserInRole(Role.Manager, Role.Barman)){
+		if (!context.isUserInRole(Role.Manager, Role.Barman)) {
 			return RESPONSE_UNAUTHORIZED;
 		}
 		Order orderCompleted = orderDAO.findById(Long.parseLong(orderId));
 		if (orderCompleted != null) {
-			if (orderCompleted.getStatus() == Status.ACCEPTED
-					|| orderCompleted.getStatus() != Status.OVERDUE) {
+			if (orderCompleted.getStatus() == Status.ACCEPTED || orderCompleted.getStatus() == Status.OVERDUE) {
 				orderDAO.setOrderAsCompleted(orderCompleted);
 				return RESPONSE_OK;
 			} else {
